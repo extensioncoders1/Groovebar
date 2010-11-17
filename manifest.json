@@ -1,0 +1,30 @@
+{
+  "name": "GrooveBar",
+  "version": "1.4.2",
+  "description": "Grooveshark Power Search Bar and Ad-Remover.",
+  "icons": { 
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "options_page": "options.html",
+  "browser_action": {
+    "default_icon": "icon.png",
+    "popup": "popup.html",
+    "information": "info.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://listen.grooveshark.com/*"],
+      "js": ["mygrooveshark.js"],
+      "css": ["mygrooveshark.css"],
+      "run_at": "document_start"
+    }
+  ],
+
+  "permissions": [
+    "tabs",
+    "notifications",
+    "http://listen.grooveshark.com/*"
+  ]
+}

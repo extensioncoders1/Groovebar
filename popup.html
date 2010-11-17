@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="Stylesheet" href="./popup.css">
+<script>
+
+var gs_tab = false;
+ 	
+var playerTab = false;
+//find player tab
+function get_gs_tab(callback,arg) {
+ 	chrome.windows.getAll({'populate':true}, function(win) {
+ 		for(var i=0,l=win.length;i<l;i++) {
+ 			var thisWin = win[i];
+ 			var tabs = thisWin.tabs;
+ 			for(var j=0,k=tabs.length;j<k;j++) {
+ 				var tab=tabs[j];
+ 				if(tab.url.indexOf('http://listen.grooveshark.com/')==0) {
+					gs_tab = tab;
+					if(typeof callback == "function") {
+						callback(arg);
+					}
+					return;
+ 				}
+ 			}
+ 		}
+ 	});
+}
+get_gs_tab(enable_buttons);
+
+function enable_buttons() {
+	var buttons = document.getElementsByTagName('button');
+	for(var i=0,l=buttons.length;i<l;i++) {
+		buttons[i].removeAttribute('disabled');
+	}
+}
+
+function buttonClick(e) {
+	var button = e.target;
+	var action = button.id;
+	if(gs_tab) {
+		send_play_control(action);
+	} else {
+		get_gs_tab(send_play_control,action);
+	}
+}
+
+function send_play_control(action) {
+	chrome.tabs.sendRequest(gs_tab.id, {action:action});
+}
+
+function reset_form() {
+	manual_title=false;
+	set_forms();
+}
+
+function init() {
+	var buttons = document.getElementsByTagName('button');
+		for(var i=0,l=buttons.length;i<l;i++) {
+		  var button = buttons[i];
+		  if(button.id == 'open') {
+			  button.addEventListener('click',activate_gs_tab,true);
+ 		} else {
+		  button.addEventListener('click',buttonClick,true);
+		}
+	}
+}
+
+function showurl(artist) {
+  chrome.tabs.create({url:"http://www.listen.grooveshark.com/#/search/songs/?query="+artist.value});
+}
+
+function showinfo(url) {
+  chrome.tabs.create({url: "http://www.internshelton.com/groovebar/index.html"});
+}
+
+</script>
+
+<form method="get" onsubmit="showurl(Artist);">
+<body onload="init()">
+<input type="text" name="Artist" size="17" maxlength="255" value="" />
+<input type="submit" value="Search GrooveShark"/>
+<center>
+<p><a onclick="showinfo();">Click to Support This Project.</a></p>
+</center>
+<center>
+<button class="player_button" disabled="disabled" type="button" id="previous">
+<button class="player_button" disabled="disabled" type="button" id="playpause">
+<button class="player_button" disabled="disabled" type="button" id="next">
+</center>
+</form>
+</body>
+</html>
